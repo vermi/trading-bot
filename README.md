@@ -18,7 +18,8 @@ Each script also has its own requirements.txt. These are important for the insta
 
 ### nyseBackData.py
 
-```Usage: nyseBackData.py [OPTIONS] START END
+```bash
+Usage: nyseBackData.py [OPTIONS] START END
 
   A script to download historical NYSE price data. Exports to CSV.
 
