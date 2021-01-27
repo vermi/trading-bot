@@ -1,14 +1,15 @@
-import pytz
-import requests
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from bs4 import BeautifulSoup
-from google.cloud import bigquery
-# import pyarrow
-from google.cloud import storage
 import string
 import time
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import pytz
+import requests
+from bs4 import BeautifulSoup
+
+# import pyarrow
+from google.cloud import bigquery, storage
 
 
 def daily_equity_quotes(event, context):
@@ -18,8 +19,7 @@ def daily_equity_quotes(event, context):
     blob = bucket.blob("td-key")
     api_key = blob.download_as_string()
 
-    # Check if the market was open today. Cloud functions use UTC and I'm in
-    # eastern so I convert the timezone
+    # Check if the market was open today. Cloud functions use UTC so we convert to EST
     today = datetime.today().astimezone(pytz.timezone("America/New_York"))
     today_fmt = today.strftime("%Y-%m-%d")
 
@@ -66,7 +66,7 @@ def daily_equity_quotes(event, context):
                 each chunk to be
                 """
                 n = max(1, n)
-                return (l[i:(i + n)] for i in range(0, len(l), n))
+                return (l[i : (i + n)] for i in range(0, len(l), n))
 
             symbols_chunked = list(chunks(list(set(symbols_clean)), 200))
 
