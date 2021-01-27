@@ -33,7 +33,7 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 
 1. Create an account on Google Cloud Platform and set up a new project.
 2. I recommend pinning the following to the Navigation Menu: Cloud Functions, Cloud Scheduler, BigQuery and Storage.
-3. In BigQuery, create a dataset called `equity_data`
+3. In BigQuery, create a dataset called `equity_data`. Also make a note of your database name
 4. In Storage, upload a text file containing your Alpaca credentials in the following format `<KEY ID>,<SECRET>`
 5. In Storage, upload a text file containg your TD Ameritrade API key
 
