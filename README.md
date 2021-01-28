@@ -67,6 +67,10 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 
 * Once the job is created, click "Run Now" to execute the first data pull and create the table.
 
+### Upload Historical Data
+
+* Upload `back_data.csv` to your Storage bucket. (See [Usage](#usage) below.)
+
 ## Usage
 
 ### nyseBackData.py
