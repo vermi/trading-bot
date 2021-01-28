@@ -165,4 +165,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 
-This suite is proprietary and not licensed for commercial or private use.
+This suite is proprietary and not licensed for commercial or private use, except where permissions has been explicitly granted in writing.
