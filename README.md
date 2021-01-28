@@ -142,6 +142,8 @@ You can adjust the momentum calculation range (default 125 days) and the momentu
 
 ### nyseBackData.py
 
+This script is meant to be run on your local machine as a one-off data pull. You can probably also use it for other things.
+
 ```bash
 Usage: nyseBackData.py [OPTIONS] START END
 
