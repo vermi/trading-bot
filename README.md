@@ -4,9 +4,9 @@ This is a small suite of tools for use in cloud-based day trading activities.
 
 ## Contents
 
-* nyseBackData.py: a script to download historical data for NYSE ticker symbols.
-* getData.py: a script that is meant to be run daily after market close. Updates price data.
-* tradingBot.py: the actual trading bot script.
+* `nyseBackData.py`: a script to download historical data for NYSE ticker symbols.
+* `getData.py`: a script that is meant to be run daily after market close. Updates price data.
+* `tradingBot.py`: the actual trading bot script.
 
 Each script also has its own requirements.txt. These are important for the cloud deployment.
 
@@ -37,7 +37,7 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 
 ## Deployment
 
-### Deploy the data script
+### Deploy data script
 
 * In Google Cloud Functions, create a new function with the following Configuration:
 
@@ -67,11 +67,60 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 
 * Once the job is created, click "Run Now" to execute the first data pull and create the table.
 
-### Upload Historical Data
+### Upload historical data
 
-* Upload `back_data.csv` to your Storage bucket. (See [Usage](#usage) below.)
+* Upload `back_data.csv` to your Storage bucket. (See [Usage](#nysebackdata.py) below.)
+* Browse to your `equity_data` dataset in BigQuery.
+* Click on Create Table
+* Enter the following paramters:
+  * Create table from: Google Cloud Storage
+  * Select file from GCS bucket: (Navigate and select) -> `back_data.csv`
+  * Table name: `daily_quote_data`
+  * Auto detect: [X] Scheme and input parameters
+  * Advanced -> Write Preference: Append to table
+  * Advanced -> [X] Ignore unknown values
+  * Advanced -> [X] Allow jagged rows
+* Click Create Table to append your historical data.
+
+### Deploy trading bot
+
+* In Google Cloud Functions, create a new function with the following Configuration:
+
+  * Function Name: `trading_bot_cf`
+  * Region: Select your favorite
+  * Trigger Type: Cloud Pub/Sub
+  * Topic: (Create a Topic) -> `trading_bot_topic`
+  * Advanced -> Memory Allocated: 4 GiB
+  * Advanced -> Timeout: 520
+
+* In the code section:
+
+  * Runtime: Python 3.7
+  * Entry point: `main`
+  * main.py: Copy/paste the contents of `tradingBot.py`
+  * requirements.txt: Copy/paste the contents of `trading_bot_requirements.txt`
+
+* Click Deploy, and wait for completion
+* In Cloud Scheduler, create a new job with the following parameters:
+
+  * Name: data_schedule_daily
+  * Frequency: Choose the best time for you. I am currently using `15 10 * * 1-5`
+  * Time Zone: America/EST
+  * Target: Pub/Sub
+  * Topic: `trading_bot_topic`
+  * Payload: Enter anything you want here. It is required, but not used by the script.
+
+* Once the job is created, you can click "Run Now" to execute your first trade. See [Usage](#trading-bot) below for caveats.
 
 ## Usage
+
+### Trading bot
+
+In order to execute your first strategy trade, you must already have positive value open positions.
+
+The bot will (probably) sell off some of your open positions in order to buy positions in the selected stocks.
+
+You can adjust the momentum calculation range (default 125 days) and the momentum score threshold (default 40) to tweak how trades work. Support for multiple algorithms will come eventually.
 
 ### nyseBackData.py
 
