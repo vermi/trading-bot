@@ -14,9 +14,7 @@ Each script also has its own requirements.txt. These are important for the cloud
 
 Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trading Evolved. This may change in the future depending on results.
 
-## Installation
-
-* [ ] TODO: Finish implementing this section
+## Initial Setup
 
 ### Alpaca Account Setup
 
@@ -29,13 +27,45 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 2. Click on `My Apps` and then create a new app. Callback URL should be `http://localhost`
 3. Note the Consumer Key for your app.
 
-### Google Cloud Platform Initial Setup
+### Google Cloud Platform Setup
 
 1. Create an account on Google Cloud Platform and set up a new project.
 2. I recommend pinning the following to the Navigation Menu: Cloud Functions, Cloud Scheduler, BigQuery and Storage.
 3. In BigQuery, create a dataset called `equity_data`. Also make a note of your database name
-4. In Storage, upload a text file containing your Alpaca credentials in the following format `<KEY ID>,<SECRET>`
-5. In Storage, upload a text file containg your TD Ameritrade API key
+4. In Storage, upload a text file called `alpaca-key` containing your Alpaca credentials in the following format `<KEY ID>,<SECRET>`
+5. In Storage, upload a text file called `td-key` containing your TD Ameritrade API key
+
+## Deployment
+
+### Deploy the data script
+
+* In Google Cloud Functions, create a new function with the following Configuration:
+
+  * Function Name: `daily_equity_quotes_cf`
+  * Region: Select your favorite
+  * Trigger Type: Cloud Pub/Sub
+  * Topic: (Create a Topic) -> `daily_equity_quotes_topic`
+  * Advanced -> Memory Allocated: 1 GiB
+  * Advanced -> Timeout: 520
+
+* In the code section:
+
+  * Runtime: Python 3.7
+  * Entry point: `main`
+  * main.py: Copy/paste the contents of `getData.py`
+  * requirements.txt: Copy/paste the contents of `get_data_requirements.txt`
+
+* Click Deploy, and wait for completion
+* In Cloud Scheduler, create a new job with the following parameters:
+
+  * Name: data_schedule_daily
+  * Frequency: `0 17 * * 1-5`
+  * Time Zone: America/EST
+  * Target: Pub/Sub
+  * Topic: `daily_equity_quotes_topic`
+  * Payload: Enter anything you want here. It is required, but not used by the script.
+
+* Once the job is created, click "Run Now" to execute the first data pull and create the table.
 
 ## Usage
 
