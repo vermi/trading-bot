@@ -1,8 +1,26 @@
 # Python Trading Bot (and accessories)
 
-This is a small suite of tools for use in cloud-based day trading activities.
+This is a small suite of tools for use in cloud-based algorithmic trading activities.
 
 ## Contents
+
+* [Components](#components)
+* [Algorithm](#algorithm)
+* [Initial Setup](#initial-setup)
+  * [Alpaca Account Setup](#alpaca-account-setup)
+  * [TD Ameritrade Developer Account Setup](#td-ameritrade-developer-account-setup)
+  * [Google Cloud Platform Setup](#google-cloud-platform-setup)
+* [Deployment](#deployment)
+  * [Deploy data script](#deploy-data-script)
+  * [Upload historical data](#upload-historical-data)
+  * [Deploy trading bot](#deploy-trading-bot)
+* [Usage](#usage)
+  * [Trading bot](#trading-bot)
+  * [nyseBackData.py](#nysebackdatapy)
+* [Contributing](#contributing)
+* [License](#license)
+
+## Components
 
 * `nyseBackData.py`: a script to download historical data for NYSE ticker symbols.
 * `getData.py`: a script that is meant to be run daily after market close. Updates price data.
