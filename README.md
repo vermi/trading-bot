@@ -69,7 +69,7 @@ Currently using a 125-day momentum algorithm blatantly stolen from Clenow's Trad
 
 ### Upload historical data
 
-* Upload `back_data.csv` to your Storage bucket. (See [Usage](#nysebackdata.py) below.)
+* Upload `back_data.csv` to your Storage bucket. (See [Usage](#nysebackdatapy) below.)
 * Browse to your `equity_data` dataset in BigQuery.
 * Click on Create Table
 * Enter the following paramters:
