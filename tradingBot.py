@@ -1,18 +1,17 @@
-import pandas as pd
-import numpy as np
-from scipy import stats
-import requests
-import time
 from datetime import datetime
-import pytz
-from google.cloud import bigquery
-from google.cloud import storage
-import pyarrow
+
 import alpaca_trade_api as tradeapi
-from pypfopt.efficient_frontier import EfficientFrontier
-from pypfopt import risk_models
-from pypfopt import expected_returns
+import numpy as np
+import pandas as pd
+import pytz
+import requests
+from google.cloud import bigquery, storage
+from pypfopt import expected_returns, risk_models
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+from pypfopt.efficient_frontier import EfficientFrontier
+from scipy import stats
+
+base_url = "https://paper-api.alpaca.markets"
 
 
 def trade_bot(event, context):
@@ -68,9 +67,6 @@ def trade_bot(event, context):
             key_id = keys_str[0]
             secret_key = keys_str[1]
 
-            # Initialize the alpaca api
-            base_url = "https://paper-api.alpaca.markets"
-
             api = tradeapi.REST(key_id, secret_key, base_url, "v2")
 
             # Get the current positions from alpaca and create a df
@@ -88,7 +84,8 @@ def trade_bot(event, context):
             )
 
             # Current portfolio value
-            portfolio_value = round(df_pf["market_value"].sum(), 2)
+            account = api.get_account()
+            portfolio_value = float(account.equity)
 
             # Calculate the momentum and select the stocks to buy
             # Set the variables for the momentum trading strategy
