@@ -42,7 +42,7 @@ def trade_bot(event, context):
                   symbol,
                   closePrice,
                   date
-                FROM 
+                FROM
                   `fair-sandbox-132013.equity_data.daily_quote_data`
                 """
 
