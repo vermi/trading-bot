@@ -523,6 +523,7 @@ def main(event, context) -> str:
     """
     try:
         if DEBUG:
+            print("Running in DEBUG mode. No trades will be executed.")
             trade()
             print("Trading complete.")
         elif check_open():
