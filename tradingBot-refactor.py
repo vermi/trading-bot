@@ -13,6 +13,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from scipy import stats
 
 # Globals
+DEBUG = False
 alpaca_url = "https://paper-api.alpaca.markets"
 bucket_name = "fair-sandbox"  # Google Cloud Storage bucket name
 db_name = "fair-sandbox-132013"  # BigQuery database name
@@ -468,40 +469,47 @@ def trade() -> None:
     # Finalize and execute sell order
     df_sell = diff_stocks(df_sell, df_pf, df_buy)
     if df_sell is not None:
-        symbol_list = df_sell["symbol"].tolist()
-        qty_list = df_sell["qty"].tolist()
-        try:
-            for symbol, qty in list(zip(symbol_list, qty_list)):
-                api.submit_order(
-                    symbol=symbol,
-                    qty=qty,
-                    side="sell",
-                    type="market",
-                    time_in_force="day",
-                )
-        except Exception:
-            pass  # TODO: Should probably handle this more gracefully
+        if DEBUG:
+            print("Sell Order:\n", df_sell)
+        else:
+            symbol_list = df_sell["symbol"].tolist()
+            qty_list = df_sell["qty"].tolist()
+            try:
+                for symbol, qty in list(zip(symbol_list, qty_list)):
+                    api.submit_order(
+                        symbol=symbol,
+                        qty=qty,
+                        side="sell",
+                        type="market",
+                        time_in_force="day",
+                    )
+            except Exception:
+                pass  # TODO: Should probably handle this more gracefully
 
     # Finalize and execute buy order
     df_buy = get_buy_data(df_pf, df_buy)
     if df_buy is not None:
-        symbol_list = df_buy["symbol"].tolist()
-        qty_list = df_buy["qty"].tolist()
-        try:
-            for symbol, qty in list(zip(symbol_list, qty_list)):
-                api.submit_order(
-                    symbol=symbol,
-                    qty=qty,
-                    side="buy",
-                    type="market",
-                    time_in_force="day",
-                )
-        except Exception:
-            pass  # TODO: Handle this more gracefully also
+        if DEBUG:
+            print("Buy Order:\n", df_buy)
+        else:
+            symbol_list = df_buy["symbol"].tolist()
+            qty_list = df_buy["qty"].tolist()
+            try:
+                for symbol, qty in list(zip(symbol_list, qty_list)):
+                    api.submit_order(
+                        symbol=symbol,
+                        qty=qty,
+                        side="buy",
+                        type="market",
+                        time_in_force="day",
+                    )
+            except Exception:
+                pass  # TODO: Handle this more gracefully also
 
     # Log new positions to BigQuery for future reference
-    positions = api.list_positions()
-    log_positions(positions)
+    if not DEBUG:
+        positions = api.list_positions()
+        log_positions(positions)
 
 
 def main(event, context) -> str:
@@ -512,14 +520,21 @@ def main(event, context) -> str:
             status (str): A status message for the Google Cloud Platform run log
     """
     try:
-        if check_open():
+        if DEBUG:
+            trade()
+            print("Trading complete.")
+        elif check_open():
             trade()
             return "Trading complete."
         else:
             return "No trade: markets closed."
     except ValueError as verr:
+        if DEBUG:
+            print("ValueError: {0}".format(verr))
         return "ValueError: {0}".format(verr)
     except Exception as err:
+        if DEBUG:
+            print("Exception: {0}".format(err))
         return "Exception: {0}".format(err)  # TODO: Implement something better
 
 
