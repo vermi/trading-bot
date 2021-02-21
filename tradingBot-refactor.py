@@ -17,21 +17,30 @@ today = datetime.today().astimezone(pytz.timezone("America/New_York"))
 today_fmt = today.strftime("%Y-%m-%d")
 
 
-def fetch_api_key(bucket_name="fair-sandbox", file_name="td-key") -> str:
+def fetch_api_key(vendor, bucket_name="fair-sandbox") -> str:
     """
-    Retrieves the TDA API key from Google Cloud Storage
+    Retrieves the appropriate API key from Google Cloud Storage
 
         Parameters:
+            vendor (str): either "tda" or "alpaca"
             bucket_name (str): the name of the bucket containing the key file
-            file_name (str): the name of the file containing the key
 
         Returns:
-            api_key (str): The TDA API key
+            api_key (tuple): The requested API key
     """
     storage_client = storage.Client()
     bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(file_name)
-    api_key = blob.download_as_string()
+
+    if vendor == "tda":
+        blob = bucket.blob("tda-key")
+        api_key = (blob.download_as_string(), None)
+
+    elif vendor == "alpaca":
+        blob = bucket.blob("alpaca-key")
+        api_key = tuple(blob.download_as_string().decode().split(","))
+
+    else:
+        raise ValueError("Invalid vendor specified.")
 
     return api_key
 
@@ -47,7 +56,7 @@ def check_open() -> bool:
     market_url = "https://api.tdameritrade.com/v1/marketdata/EQUITY/hours"
 
     params = {
-        "apikey": fetch_api_key(),
+        "apikey": fetch_api_key("tda"),
         "date": today_fmt,
     }
 
