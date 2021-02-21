@@ -13,7 +13,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from scipy import stats
 
 # Globals
-DEBUG = False
+DEBUG = True
 alpaca_url = "https://paper-api.alpaca.markets"
 bucket_name = "fair-sandbox"  # Google Cloud Storage bucket name
 db_name = "fair-sandbox-132013"  # BigQuery database name
@@ -54,7 +54,7 @@ class Momentum(Strategy):
             portfiolo_size (int): The target number of stocks to hold
 
         Methods:
-            score(ts): Computes the momentum score for a ticker symbol
+            __score(ts): Computes the momentum score for a ticker symbol
             get_buy_list(df, date, portfolio_size, cash): Computes the list of buy stocks
             prepare_df(df): Prepares the historical DataFrame by calculating momentum
     """
@@ -66,7 +66,7 @@ class Momentum(Strategy):
         self.minimum = minimum
         self.portfolio_size = portfolio_size
 
-    def score(ts: pd.Series) -> int:
+    def __score(self, ts: pd.Series) -> int:
         """
         Calculates the moment score of the selected ticker symbol. For use with pandas apply().
 
@@ -118,7 +118,7 @@ class Momentum(Strategy):
         S = risk_models.sample_cov(df_u)
 
         # Optimise the portfolio for maximal Sharpe ratio
-        ef = EfficientFrontier(mu, S, gamma=1)  # Use regularization (gamma=1)
+        ef = EfficientFrontier(mu, S)
         weights = (
             ef.max_sharpe()
         )  # Ignore the fact that this variable isn't referenced. EfficientFrontier is weird.
@@ -166,7 +166,7 @@ class Momentum(Strategy):
         df["momentum"] = (
             df.groupby("symbol")["close"]
             .rolling(self.window, min_periods=self.minimum)
-            .apply(self.score)
+            .apply(self.__score)
             .reset_index(level=0, drop=True)
         )
 
@@ -368,7 +368,7 @@ def get_hist_data() -> DataFrame:
     """
     # Establish BigQuery connection
     client = bigquery.Client()
-    query_str = "SELECT symbole, closePrice, date FROM `{0}.equity_data.daily_quote_data`".format(
+    query_str = "SELECT symbol, closePrice, date FROM `{0}.equity_data.daily_quote_data`".format(
         db_name
     )
 
@@ -448,6 +448,8 @@ def trade() -> None:
         qty.append(int(p.qty))
         market_value.append(float(p.market_value))
     df_pf = pd.DataFrame({"symbol": symbol, "qty": qty, "market_value": market_value})
+    if DEBUG:
+        print("Current Portfolio:\n", df_pf)
 
     # Get current equity
     account = api.get_account()
