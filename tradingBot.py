@@ -13,7 +13,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from scipy import stats
 
 # Globals
-DEBUG = True
+DEBUG = False
 alpaca_url = "https://paper-api.alpaca.markets"
 bucket_name = "fair-sandbox"  # Google Cloud Storage bucket name
 db_name = "fair-sandbox-132013"  # BigQuery database name
@@ -188,7 +188,7 @@ def fetch_api_key(vendor: str, bucket_name: str) -> str:
     bucket = storage_client.get_bucket(bucket_name)
 
     if vendor == "tda":
-        blob = bucket.blob("tda-key")
+        blob = bucket.blob("td-key")
         api_key = (blob.download_as_string(), None)
 
     elif vendor == "alpaca":
