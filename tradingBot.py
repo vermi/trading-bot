@@ -36,10 +36,12 @@ class Strategy:
     def __init__(self):
         self.name = None
 
-    def get_buy_list():
+    def get_buy_list(self):
+        # Skeleton framework, empty method.
         pass
 
-    def prepare_df():
+    def prepare_df(self):
+        # Skeleton framework, empty method.
         pass
 
 
@@ -173,7 +175,7 @@ class Momentum(Strategy):
         return df
 
 
-def fetch_api_key(vendor: str, bucket_name: str) -> str:
+def fetch_api_key(vendor: str, bucket_name: str) -> tuple:
     """
     Retrieves the appropriate API key from Google Cloud Storage
 
