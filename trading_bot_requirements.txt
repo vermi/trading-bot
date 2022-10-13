@@ -5,7 +5,7 @@ pytz==2020.1
 alpaca_trade_api==0.53.0
 numpy==1.22.0rc1
 pandas==1.2.2
-protobuf==3.15.1
+protobuf==3.18.3
 scipy==1.6.1
 pyportfolioopt==1.4.0
 pyarrow==0.12.0
