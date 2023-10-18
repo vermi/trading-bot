@@ -5,3 +5,4 @@ pandas==0.23.3
 progress==1.5
 requests==2.22.0
 yahoofinancials==1.6
+urllib3>=1.26.18 # not directly required, pinned by Snyk to avoid a vulnerability
